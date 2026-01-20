@@ -1,5 +1,7 @@
 package com.devops.cicd.user;
 
+import com.devops.cicd.PasswordPolicy;
+
 public class UserService {
 
     /**
@@ -11,7 +13,14 @@ public class UserService {
      * - propage les erreurs si les données sont invalides
      */
     public User register(String email, String password, Role role) {
-        // TODO: implémenter en s'appuyant sur User
+        try {
+            return new User(email, password, role);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 }
