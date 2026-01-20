@@ -1,7 +1,5 @@
 package com.devops.cicd.user;
 
-import com.devops.cicd.PasswordPolicy;
-
 public class UserService {
 
     /**
@@ -14,7 +12,7 @@ public class UserService {
      */
     public User register(String email, String password, Role role) {
         try {
-            return new User(email, password, role);
+            return User.of(email, password, role);
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
