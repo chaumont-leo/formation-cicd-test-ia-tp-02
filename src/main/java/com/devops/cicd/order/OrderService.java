@@ -18,7 +18,19 @@ public class OrderService {
     public static final double PRIORITY_FEE = 9.99;
 
     public double computeTotal(Order order) {
-        // TODO: implémenter le calcul du total
-        return 0.0;
+        try {
+            OrderValidator.validate(order);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+        double subTotal = order.getUnitPrice() * order.getQuantity();
+        if(subTotal >= 100) {
+            subTotal = subTotal * 0.95;
+        }
+        if(order.isPriority()) {
+            subTotal = subTotal + PRIORITY_FEE;
+        }
+
+        return Math.round(subTotal * 100.0) / 100.0;
     }
 }
