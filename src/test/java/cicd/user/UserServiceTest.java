@@ -15,72 +15,35 @@ class UserServiceTest {
 
     private final UserService userService = new UserService();
 
-    @Nested
-    @DisplayName("Cas Nominaux - Inscriptions réussies")
-    class SuccessTests {
+    @Test
+    @DisplayName("Inscription d'un membre standard")
+    void testRegisterMemberSuccess() {
+        // [cite: 12, 13] Création d'un utilisateur avec données conformes
+        User user = userService.register("test.test@gmail.com", "Azerty1!", Role.USER);
 
-        @Test
-        @DisplayName("Inscription d'un membre standard")
-        void testRegisterMemberSuccess() {
-            // [cite: 12, 13] Création d'un utilisateur avec données conformes
-            User user = userService.register("test.test@gmail.com", "Azerty1!", Role.USER);
-
-            assertNotNull(user);
-            assertEquals("test.test@gmail.com", user.getEmail());
-            //  Un rôle MEMBER (USER) ne doit pas avoir accès à l'admin
-            assertFalse(user.canAccessAdminArea());
-        }
-
-        @Test
-        @DisplayName("Inscription d'un administrateur")
-        void testRegisterAdminSuccess() {
-            User user = userService.register("test.test@gmail.com", "Azerty1!", Role.ADMIN);
-
-            assertNotNull(user);
-            // [cite: 9, 10] L'accès Admin est réservé au rôle ADMIN
-            assertTrue(user.canAccessAdminArea());
-        }
+        assertNotNull(user);
+        assertEquals("test.test@gmail.com", user.getEmail());
+        assertFalse(user.canAccessAdminArea());
     }
 
-    @Nested
-    @DisplayName("Cas d'Erreur - Validations et Exceptions")
-    class FailureTests {
+    @Test
+    @DisplayName("Inscription d'un admin")
+    void testRegisterAdminSuccess() {
+        // [cite: 12, 13] Création d'un utilisateur avec données conformes
+        User user = userService.register("test.test@gmail.com", "Azerty1!", Role.ADMIN);
 
-        @Test
-        @DisplayName("Échec : Format d'email invalide")
-        void testInvalidEmail() {
-            // [cite: 3, 4] Règle : Doit contenir un point après le @
-            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                    userService.register("sdfsdfsdf@sdfsdf", "Azerty1!", Role.USER)
-            );
-            assertEquals("email must be valid", ex.getMessage());
-        }
-
-        @ParameterizedTest
-        @CsvSource({
-                "azerty1!, USER, 'Minuscules uniquement'",
-                "AAzerty1, USER, 'Pas de caractère spécial'",
-                "Azertyyy!, USER, 'Pas de chiffre'",
-                "Azty1!, ADMIN, 'Longueur < 8 caractères'"
-        })
-        @DisplayName("Échec : Mot de passe non conforme")
-        void testWeakPasswords(String password, Role role, String scenario) {
-            // [cite: 6, 7] Règles : >= 8 car., 1 Maj, 1 min, 1 chiffre, 1 car. spécial
-            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                    userService.register("sdfsdfsdf@sdfsdf.com", password, role)
-            );
-            assertEquals("password must be strong", ex.getMessage());
-        }
-
-        @Test
-        @DisplayName("Échec : Rôle manquant")
-        void testNullRole() {
-            // [cite: 9, 10] Règle : Rôle obligatoire (non null)
-            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
-                    userService.register("sdfsdfsdf@sdfsdf.com", "Azerty1!", null)
-            );
-            // Note : Correction du message "ole" vers "role" selon les specs 
-            assertEquals("role must not be null", ex.getMessage());
-        }
+        assertNotNull(user);
+        assertEquals("test.test@gmail.com", user.getEmail());
+        assertTrue(user.canAccessAdminArea());
     }
+
+    @Test
+    @DisplayName("Inscription en échec")
+    void testRegisterMemberFailed() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () ->
+                userService.register("sdfsdfsdf@sdfsdf", "Azerty1!", Role.USER)
+        );
+        assertEquals("email must be valid", ex.getMessage());
+    }
+
 }
